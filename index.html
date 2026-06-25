@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feliz Cumpleaños, Valeria 🔬</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --negro:  #0A0A0A;
+      --verde:  #8BC34A;
+      --sepia:  #F5E6C8;
+      --dorado: #C9A84C;
+      --texto:  #E8E0D0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--negro);
+      color: var(--texto);
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--negro); }
+    ::-webkit-scrollbar-thumb { background: var(--verde); border-radius: 2px; }
+
+    /* ══ INTRO ══ */
+    #intro-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      transition: opacity 1.2s ease;
+    }
+    #intro-screen.fade-out { opacity: 0; pointer-events: none; }
+    #depetri-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+    .t-wrap {
+      position: relative; z-index: 2;
+      max-width: 560px; width: 100%;
+    }
+    .t-line {
+      font-size: clamp(0.7rem, 2vw, 0.92rem);
+      color: var(--verde);
+      margin-bottom: 0.9rem;
+      min-height: 1.4em;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .t-line.gold { color: var(--dorado); }
+    .t-cursor {
+      display: inline-block; width: 8px; height: 1em;
+      background: var(--verde); vertical-align: text-bottom;
+      animation: blink 0.7s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    #green-flash {
+      position: fixed; inset: 0; z-index: 10001;
+      background: radial-gradient(ellipse at center, rgba(139,195,74,0.5) 0%, transparent 70%);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.08s ease;
+    }
+    #green-flash.on { opacity: 1; }
+
+    /* ══ REVEAL ANIMATIONS ══ */
+    .reveal       { opacity:0; transform:translateY(26px);  transition:opacity .65s ease,transform .65s ease; }
+    .reveal-l     { opacity:0; transform:translateX(-28px); transition:opacity .65s ease,transform .65s ease; }
+    .reveal-r     { opacity:0; transform:translateX(28px);  transition:opacity .65s ease,transform .65s ease; }
+    .reveal-z     { opacity:0; transform:scale(.88);        transition:opacity .55s ease,transform .55s ease; }
+    .reveal.visible,.reveal-l.visible,.reveal-r.visible,.reveal-z.visible {
+      opacity:1; transform:none;
+    }
+
+    .sep { width:100%; height:1px; background:linear-gradient(to right,transparent,var(--verde),transparent); opacity:.2; }
+
+    .s-eye   { font-size:.58rem; letter-spacing:.26em; text-transform:uppercase; color:rgba(139,195,74,.38); text-align:center; margin-bottom:.55rem; }
+    .s-eye.dark { color:rgba(80,58,10,.5); }
+    .s-title { font-size:clamp(1rem,3vw,1.4rem); font-weight:700; text-align:center; margin-bottom:.45rem; }
+    .s-rule  { width:34px; height:2px; background:var(--verde); margin:.9rem auto 3rem; opacity:.5; }
+    .s-rule.g { background:var(--dorado); }
+
+    /* ══ HERO ══ */
+    #hero {
+      min-height:100vh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; padding:6rem 2rem 4rem;
+      position:relative; overflow:hidden;
+    }
+    #hero::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(139,195,74,.09) 0%,transparent 70%),
+                 radial-gradient(ellipse 40% 30% at 80% 70%,rgba(201,168,76,.05) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .formulas-bg {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+      opacity:.055; font-size:.67rem; color:var(--verde);
+      display:flex; flex-wrap:wrap; align-content:flex-start;
+      gap:1.8rem; padding:2rem; line-height:2.8; user-select:none;
+    }
+    #particulas { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .particula  { position:absolute; border-radius:50%; opacity:0; animation:flotar linear infinite; }
+    @keyframes flotar {
+      0%   { transform:translateY(0) scale(.3); opacity:0; }
+      10%  { opacity:.8; }
+      90%  { opacity:.4; }
+      100% { transform:translateY(-110vh) scale(1); opacity:0; }
+    }
+    .hero-eye    { font-size:clamp(.6rem,1.8vw,.78rem); color:rgba(139,195,74,.42); letter-spacing:.28em; text-transform:uppercase; margin-bottom:1rem; position:relative; z-index:1; }
+    .hero-nombre {
+      font-size:clamp(3.5rem,13vw,9rem); font-weight:700; color:var(--verde);
+      letter-spacing:-.03em; line-height:.95;
+      animation:pulso 4s ease-in-out infinite;
+      position:relative; z-index:1; cursor:default;
+    }
+    @keyframes pulso {
+      0%,100% { text-shadow:0 0 40px rgba(139,195,74,.35),0 0 80px rgba(139,195,74,.12); }
+      50%      { text-shadow:0 0 70px rgba(139,195,74,.55),0 0 130px rgba(139,195,74,.22); }
+    }
+    .hero-nombre::before,.hero-nombre::after {
+      content:attr(data-text); position:absolute; top:0; left:0;
+      width:100%; height:100%; opacity:0; pointer-events:none;
+    }
+    .hero-nombre:hover::before { color:var(--dorado); left:3px; clip-path:polygon(0 20%,100% 20%,100% 42%,0 42%); animation:g1 .45s steps(2) forwards; }
+    .hero-nombre:hover::after  { color:#5eead4; left:-3px; clip-path:polygon(0 58%,100% 58%,100% 78%,0 78%); animation:g2 .45s steps(2) forwards; }
+    @keyframes g1 { 0%{opacity:1;transform:translate(0)} 40%{transform:translate(-5px,2px)} 70%{transform:translate(5px,-2px);opacity:1} 100%{opacity:0} }
+    @keyframes g2 { 0%{opacity:1;transform:translate(0)} 40%{transform:translate(5px,-2px)} 70%{transform:translate(-5px,2px);opacity:1} 100%{opacity:0} }
+    .hero-sub { font-size:clamp(.58rem,1.6vw,.8rem); color:var(--dorado); letter-spacing:.14em; text-transform:uppercase; margin-top:1.8rem; margin-bottom:1.8rem; position:relative; z-index:1; }
+    .contador-wrap { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin:.5rem 0 1rem; position:relative; z-index:1; }
+    .cnt-bloque { display:flex; flex-direction:column; align-items:center; gap:.3rem; }
+    .cnt-num    { font-size:clamp(2rem,6vw,3.4rem); font-weight:700; color:var(--verde); line-height:1; font-variant-numeric:tabular-nums; }
+    .cnt-lbl    { font-size:.52rem; letter-spacing:.22em; text-transform:uppercase; color:rgba(201,168,76,.55); }
+    .cnt-sep    { font-size:clamp(2rem,5vw,2.8rem); color:rgba(139,195,74,.18); align-self:flex-start; padding-top:.2rem; font-weight:300; }
+    .lab-badge {
+      display:inline-flex; align-items:center; gap:.5rem;
+      border:1px solid rgba(139,195,74,.25); padding:.4rem 1rem;
+      font-size:.62rem; letter-spacing:.16em; text-transform:uppercase;
+      color:rgba(139,195,74,.6); margin-bottom:1.8rem; position:relative; z-index:1;
+    }
+    .lab-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--verde); box-shadow:0 0 8px var(--verde); animation:blink-d 1.4s ease-in-out infinite; }
+    @keyframes blink-d { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .hero-intimo { font-family:'Caveat',cursive; font-size:clamp(1.2rem,3vw,1.6rem); color:var(--texto); max-width:500px; line-height:1.55; opacity:.8; position:relative; z-index:1; }
+
+    /* ══ BITÁCORA ══ */
+    #bitacora { background:var(--sepia); padding:5rem 2rem; position:relative; }
+    #bitacora::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.026) 0px,rgba(0,0,0,.026) 1px,transparent 1px,transparent 28px);
+    }
+    .b-intro { font-size:clamp(.66rem,2vw,.8rem); color:#6B5C3E; letter-spacing:.06em; text-align:center; margin-bottom:3.5rem; max-width:520px; margin-left:auto; margin-right:auto; line-height:1.7; }
+    .timeline { position:relative; max-width:640px; margin:0 auto; padding-left:2px; }
+    .timeline::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:linear-gradient(to bottom,var(--verde),var(--dorado)); opacity:.4; }
+    .tl-item { padding:0 0 2.5rem 2.4rem; position:relative; }
+    .tl-item::before { content:''; position:absolute; left:-5px; top:.35rem; width:12px; height:12px; border-radius:50%; background:var(--verde); box-shadow:0 0 10px rgba(139,195,74,.45); }
+    .tl-fecha  { font-size:.6rem; color:var(--dorado); letter-spacing:.17em; text-transform:uppercase; margin-bottom:.25rem; }
+    .tl-titulo { font-size:clamp(.8rem,2.2vw,.96rem); font-weight:700; color:#3D2E00; margin-bottom:.35rem; }
+    .tl-desc   { font-family:'Caveat',cursive; font-size:clamp(1rem,2.4vw,1.18rem); color:#5C4A28; line-height:1.5; border-left:2px solid rgba(201,168,76,.45); padding-left:.8rem; }
+
+    /* ══ PERSONAJES ══ */
+    #personajes { padding:5rem 2rem; background:#080808; }
+    .personajes-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; max-width:820px; margin:0 auto; }
+    @media(max-width:620px){ .personajes-grid{ grid-template-columns:1fr; } }
+    .pj-card {
+      display:flex; flex-direction:column; align-items:center; gap:1.2rem;
+      padding:2rem 1.5rem; border:1px solid rgba(139,195,74,.12);
+      background:rgba(139,195,74,.025);
+      transition:border-color .3s,box-shadow .3s;
+    }
+    .pj-card:hover { border-color:rgba(139,195,74,.3); box-shadow:0 0 30px rgba(139,195,74,.06); }
+    .pj-card.gen-card { border-color:rgba(201,168,76,.15); background:rgba(201,168,76,.025); }
+    .pj-card.gen-card:hover { border-color:rgba(201,168,76,.35); box-shadow:0 0 30px rgba(201,168,76,.07); }
+
+    /* FIX: frame de imagen — solo muestra img si carga, si no muestra placeholder */
+    .pj-img-frame { width:200px; height:200px; position:relative; flex-shrink:0; }
+    @media(max-width:400px){ .pj-img-frame{ width:160px; height:160px; } }
+    .pj-img-frame::before {
+      content:''; position:absolute; inset:-3px;
+      background:linear-gradient(135deg,var(--verde),transparent,var(--verde));
+      opacity:.4; clip-path:polygon(8% 0%,100% 0%,92% 100%,0% 100%);
+    }
+    .gen-card .pj-img-frame::before { background:linear-gradient(135deg,var(--dorado),transparent,var(--dorado)); }
+
+    .pj-img {
+      width:100%; height:100%; object-fit:cover; display:block;
+      clip-path:polygon(8% 0%,100% 0%,92% 100%,0% 100%);
+      filter:grayscale(15%) contrast(1.05);
+      transition:filter .4s;
+      /* Oculta broken-image icon nativo */
+      background:#111;
+    }
+    .pj-card:hover .pj-img { filter:grayscale(0%) contrast(1.1); }
+
+    /* Placeholder — se muestra SOLO si la img falla (JS lo maneja) */
+    .pj-placeholder {
+      display:none; /* oculto por defecto */
+      width:100%; height:100%;
+      background:linear-gradient(135deg,#111 0%,#1a1a1a 100%);
+      clip-path:polygon(8% 0%,100% 0%,92% 100%,0% 100%);
+      flex-direction:column; align-items:center; justify-content:center;
+      gap:.6rem; color:rgba(139,195,74,.3);
+      border:1px solid rgba(139,195,74,.08);
+    }
+    .gen-card .pj-placeholder { color:rgba(201,168,76,.3); border-color:rgba(201,168,76,.08); }
+    .pj-placeholder svg { width:36px; height:36px; }
+    .pj-placeholder span { font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; }
+
+    .pj-info { text-align:center; }
+    .pj-nombre { font-size:clamp(1rem,3vw,1.25rem); font-weight:700; color:var(--verde); margin-bottom:.3rem; }
+    .gen-card .pj-nombre { color:var(--dorado); }
+    .pj-rol   { font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:rgba(201,168,76,.5); margin-bottom:.8rem; }
+    .gen-card .pj-rol { color:rgba(201,168,76,.6); }
+    .pj-quote { font-family:'Caveat',cursive; font-size:clamp(.95rem,2.2vw,1.12rem); line-height:1.55; color:rgba(232,224,208,.7); }
+    .gen-card .pj-quote { color:rgba(201,168,76,.75); }
+
+    /* ══ JUNTOS ══ */
+    #juntos {
+      padding:5rem 2rem;
+      background:linear-gradient(180deg,#050505 0%,#0c0c0c 50%,#050505 100%);
+      position:relative; overflow:hidden;
+    }
+    #juntos::before {
+      content:'KNO₃  C₆H₁₂O₆  H₂SO₄  NaOH  Fe₂O₃  CaCO₃  KNO₃';
+      position:absolute; top:2rem; left:0; right:0;
+      font-size:.55rem; color:rgba(139,195,74,.04);
+      letter-spacing:.35em; text-align:center; pointer-events:none;
+    }
+    .juntos-inner { max-width:860px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:2.5rem; }
+    .juntos-frame { display:flex; align-items:flex-end; justify-content:center; gap:0; position:relative; width:100%; max-width:500px; }
+    .j-img-wrap { position:relative; flex:1; max-width:220px; }
+    .j-img-wrap:first-child { z-index:2; transform:rotate(-3deg) translateX(12px); }
+    .j-img-wrap:last-child  { z-index:1; transform:rotate(3deg) translateX(-12px); }
+    .j-img-wrap::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 60%); pointer-events:none; }
+    .j-img {
+      width:100%; aspect-ratio:3/4; object-fit:cover; display:block;
+      filter:grayscale(20%); border:2px solid;
+      transition:filter .3s;
+      background:#111;
+    }
+    .j-img-wrap:first-child .j-img { border-color:rgba(139,195,74,.4); }
+    .j-img-wrap:last-child  .j-img { border-color:rgba(201,168,76,.4); }
+    .juntos-frame:hover .j-img { filter:grayscale(0%); }
+
+    /* Placeholder juntos — igual: oculto por defecto */
+    .j-placeholder {
+      display:none;
+      width:100%; aspect-ratio:3/4;
+      background:#111; border:2px solid rgba(139,195,74,.1);
+      flex-direction:column; align-items:center; justify-content:center;
+      gap:.6rem; color:rgba(139,195,74,.2);
+    }
+    .j-img-wrap:last-child .j-placeholder { border-color:rgba(201,168,76,.1); color:rgba(201,168,76,.2); }
+    .j-placeholder svg { width:32px; height:32px; }
+    .j-placeholder span { font-size:.5rem; letter-spacing:.18em; text-transform:uppercase; }
+
+    .j-label { position:absolute; bottom:.6rem; left:0; right:0; text-align:center; font-size:.6rem; letter-spacing:.15em; text-transform:uppercase; z-index:3; }
+    .j-img-wrap:first-child .j-label { color:var(--verde); }
+    .j-img-wrap:last-child  .j-label { color:var(--dorado); }
+
+    .juntos-texto { text-align:center; max-width:600px; }
+    .juntos-titulo { font-family:'Space Mono',monospace; font-size:clamp(1.1rem,3.5vw,1.6rem); font-weight:700; color:var(--verde); margin-bottom:1.5rem; }
+    .juntos-msg { font-family:'Caveat',cursive; font-size:clamp(1.1rem,2.8vw,1.45rem); color:var(--sepia); line-height:1.7; opacity:.88; }
+    .juntos-div { display:flex; align-items:center; gap:1rem; width:100%; max-width:400px; }
+    .juntos-div-line { flex:1; height:1px; background:linear-gradient(to right,transparent,rgba(139,195,74,.25)); }
+    .juntos-div-line.rev { background:linear-gradient(to left,transparent,rgba(201,168,76,.25)); }
+    .juntos-div-icon { font-size:1.2rem; }
+
+    /* ══ CARTAS ══ */
+    #cartas { padding:5rem 2rem; background:var(--negro); }
+    .cartas-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.8rem; max-width:860px; margin:0 auto; }
+    @media(max-width:660px){ .cartas-grid{ grid-template-columns:1fr; } }
+    .carta { padding:1.8rem; border-radius:1px; }
+    .carta-senku { background:#0E0E0E; border:1px solid rgba(139,195,74,.32); box-shadow:inset 0 0 40px rgba(139,195,74,.025); }
+    .carta-gen   { background:#EDD9A3; border:1px solid rgba(201,168,76,.5); }
+    .c-head { display:flex; align-items:center; gap:.65rem; padding-bottom:.9rem; margin-bottom:1.1rem; }
+    .carta-senku .c-head { border-bottom:1px solid rgba(139,195,74,.18); }
+    .carta-gen   .c-head { border-bottom:1px solid rgba(201,168,76,.28); }
+    .c-icon   { width:18px; height:18px; flex-shrink:0; }
+    .c-nombre { font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; }
+    .carta-senku .c-nombre { color:var(--verde); }
+    .carta-gen   .c-nombre { color:#7A5C1E; }
+    .c-rol { font-size:.55rem; letter-spacing:.1em; margin-top:.1rem; }
+    .carta-senku .c-rol { color:rgba(139,195,74,.32); }
+    .carta-gen   .c-rol  { color:rgba(122,92,30,.52); }
+    .carta-senku .c-body { font-size:.79rem; color:rgba(232,224,208,.8); line-height:1.85; }
+    .carta-gen   .c-body { font-family:'Caveat',cursive; font-size:1.3rem; color:#3D2800; line-height:1.6; }
+
+    /* ══ INVENTARIO ══ */
+    #inventario { padding:5rem 2rem; background:#080808; }
+    .inv-grid { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; max-width:640px; margin:0 auto 1.1rem; }
+    @media(max-width:460px){ .inv-grid{ grid-template-columns:1fr; } }
+    .inv-item { display:flex; align-items:center; gap:.7rem; padding:.82rem 1rem; border:1px solid rgba(139,195,74,.1); font-size:.74rem; color:var(--texto); background:rgba(139,195,74,.022); transition:border-color .22s,background .22s; }
+    .inv-item:hover { border-color:rgba(139,195,74,.3); background:rgba(139,195,74,.05); }
+    .inv-icon { width:16px; height:16px; color:var(--verde); flex-shrink:0; }
+    .inv-especial { max-width:640px; margin:0 auto; display:flex; align-items:center; gap:.7rem; padding:.95rem 1.15rem; border:1px solid var(--dorado); background:rgba(201,168,76,.055); font-size:.82rem; color:var(--dorado); font-weight:700; }
+
+    /* ══ FINAL ══ */
+    #final {
+      min-height:100vh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; padding:6rem 2rem;
+      background:var(--negro); position:relative; overflow:hidden;
+    }
+    #final::after { content:'KNO₃  C₆H₁₂O₆  H₂SO₄  KNO₃  NaOH  CaCO₃'; position:absolute; bottom:1.5rem; left:0; right:0; font-size:.52rem; color:rgba(139,195,74,.045); letter-spacing:.35em; text-align:center; pointer-events:none; }
+    .final-titulo  { font-size:clamp(2rem,7vw,4.2rem); font-weight:700; color:var(--verde); line-height:1.08; margin-bottom:2.2rem; position:relative; z-index:1; }
+    .final-mensaje { font-family:'Caveat',cursive; font-size:clamp(1.2rem,2.8vw,1.58rem); color:var(--sepia); max-width:560px; line-height:1.72; margin-bottom:2.5rem; opacity:.9; position:relative; z-index:1; white-space:pre-line; }
+    .final-firma   { font-size:.7rem; color:var(--dorado); letter-spacing:.2em; text-transform:uppercase; margin-bottom:.4rem; position:relative; z-index:1; }
+    .kno3-deco { font-size:.56rem; color:rgba(201,168,76,.2); letter-spacing:.3em; margin-bottom:3rem; position:relative; z-index:1; }
+    .btn-mecha {
+      font-family:'Space Mono',monospace; font-size:.82rem;
+      background:transparent; border:1px solid var(--verde);
+      color:var(--verde); padding:.9rem 2.2rem; cursor:pointer;
+      letter-spacing:.1em; transition:color .25s,box-shadow .25s,transform .1s;
+      position:relative; z-index:1; overflow:hidden;
+    }
+    .btn-mecha::before { content:''; position:absolute; left:-100%; top:0; bottom:0; width:100%; background:var(--verde); transition:left .32s ease; z-index:-1; }
+    .btn-mecha:hover::before { left:0; }
+    .btn-mecha:hover { color:var(--negro); box-shadow:0 0 28px rgba(139,195,74,.4); }
+    .btn-mecha:active { transform:scale(.97); }
+
+    #confeti-canvas { position:fixed; inset:0; pointer-events:none; z-index:8888; }
+  </style>
+</head>
+<body>
+<canvas id="confeti-canvas"></canvas>
+<div id="green-flash"></div>
+
+<!-- ══ INTRO ══ -->
+<div id="intro-screen">
+  <canvas id="depetri-canvas"></canvas>
+  <div class="t-wrap">
+    <div class="t-line" id="tl1"></div>
+    <div class="t-line" id="tl2"></div>
+    <div class="t-line gold" id="tl3"></div>
+    <span class="t-cursor"></span>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="formulas-bg" aria-hidden="true">
+    KNO₃ C₆H₁₂O₆ H₂SO₄ NaOH Fe₂O₃ CaCO₃ CH₄ NH₃ HCl C₂H₅OH
+    KNO₃ SiO₂ Al₂O₃ NaCl MgO CO₂ H₂O₂ C₁₂H₂₂O₁₁ KMnO₄ Na₂CO₃
+    KNO₃ C₆H₁₂O₆ H₂SO₄ NaOH Fe₂O₃ CaCO₃ CH₄ NH₃ HCl C₂H₅OH
+    KNO₃ SiO₂ Al₂O₃ NaCl MgO CO₂ H₂O₂ C₁₂H₂₂O₁₁ KMnO₄ Na₂CO₃
+  </div>
+  <div id="particulas" aria-hidden="true"></div>
+  <p class="hero-eye reveal">— La petrificación ha terminado —</p>
+  <h1 class="hero-nombre reveal" data-text="Valeria" style="transition-delay:.15s">Valeria</h1>
+  <p class="hero-sub reveal" style="transition-delay:.3s">Miembro honoraria del Reino Científico — y de algo más importante</p>
+  <div class="contador-wrap reveal" style="transition-delay:.38s">
+    <div class="cnt-bloque"><span class="cnt-num" id="cnt-d">---</span><span class="cnt-lbl">días</span></div>
+    <span class="cnt-sep">:</span>
+    <div class="cnt-bloque"><span class="cnt-num" id="cnt-h">--</span><span class="cnt-lbl">horas</span></div>
+    <span class="cnt-sep">:</span>
+    <div class="cnt-bloque"><span class="cnt-num" id="cnt-m">--</span><span class="cnt-lbl">minutos</span></div>
+  </div>
+  <p class="lab-badge reveal" style="transition-delay:.44s">tiempo construyendo algo real</p>
+  <p class="hero-intimo reveal" style="transition-delay:.52s">
+    No hace falta haber estado en el mismo lugar<br>para haber compartido el mismo mundo.
+  </p>
+</section>
+<div class="sep"></div>
+
+<!-- ══ BITÁCORA ══ -->
+<section id="bitacora">
+  <p class="s-eye dark reveal">Archivo — El Reino Científico</p>
+  <h2 class="s-title reveal" style="color:#3D2E00;transition-delay:.1s">Bitácora de Descubrimientos</h2>
+  <div class="s-rule g reveal" style="transition-delay:.2s"></div>
+  <p class="b-intro reveal" style="transition-delay:.25s">
+    Todo gran científico documenta lo que importa.<br>Esto importa.
+  </p>
+  <div class="timeline" id="timeline-container"></div>
+</section>
+<div class="sep"></div>
+
+<!-- ══ PERSONAJES ══ -->
+<section id="personajes">
+  <p class="s-eye reveal">El Reino Científico — Expediente</p>
+  <h2 class="s-title reveal" style="transition-delay:.1s">Los que te mandan saludos</h2>
+  <div class="s-rule reveal" style="transition-delay:.2s"></div>
+  <div class="personajes-grid">
+    <!-- SENKU -->
+    <div class="pj-card reveal-l">
+      <div class="pj-img-frame">
+        <img class="pj-img" src="img/senku.png" alt="Senku"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="pj-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-linecap="round"/>
+          </svg>
+          <span>foto de senku</span>
+        </div>
+      </div>
+      <div class="pj-info">
+        <div class="pj-nombre">Senku Ishigami</div>
+        <div class="pj-rol">Científico Jefe — El Reino Científico</div>
+        <p class="pj-quote">
+          "La probabilidad de que alguien como tú exista es, al 10 mil millones porciento, la mejor anomalía que he calculado."
+        </p>
+      </div>
+    </div>
+    <!-- GEN -->
+    <div class="pj-card gen-card reveal-r" style="transition-delay:.15s">
+      <div class="pj-img-frame">
+        <img class="pj-img" src="img/gen.png" alt="Gen"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="pj-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-linecap="round"/>
+          </svg>
+          <span>foto de gen</span>
+        </div>
+      </div>
+      <div class="pj-info">
+        <div class="pj-nombre">Gen Asagiri</div>
+        <div class="pj-rol">Mentalista — El Reino Científico</div>
+        <p class="pj-quote">
+          "Leo personas para vivir. Y lo que leo en ti es algo muy poco común — el tipo de energía que hace que todo valga la pena."
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="sep"></div>
+
+<!-- ══ JUNTOS ══ -->
+<section id="juntos">
+  <p class="s-eye reveal">El Reino Científico — Transmisión especial</p>
+  <h2 class="s-title reveal" style="transition-delay:.1s">Feliz cumpleaños, de parte de los dos</h2>
+  <div class="s-rule reveal" style="transition-delay:.2s"></div>
+  <div class="juntos-inner">
+    <div class="juntos-frame reveal-z" style="transition-delay:.1s">
+      <div class="j-img-wrap">
+        <img class="j-img" src="img/senku.png" alt="Senku"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="j-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="width:28px;height:28px">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-linecap="round"/>
+          </svg>
+          <span>senku</span>
+        </div>
+        <div class="j-label">Senku</div>
+      </div>
+      <div class="j-img-wrap">
+        <img class="j-img" src="img/gen.png" alt="Gen"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <div class="j-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="width:28px;height:28px">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-linecap="round"/>
+          </svg>
+          <span>gen</span>
+        </div>
+        <div class="j-label">Gen</div>
+      </div>
+    </div>
+    <div class="juntos-div reveal" style="transition-delay:.2s">
+      <div class="juntos-div-line"></div>
+      <span class="juntos-div-icon">🔬</span>
+      <div class="juntos-div-line rev"></div>
+    </div>
+    <div class="juntos-texto reveal" style="transition-delay:.25s">
+      <div class="juntos-titulo">"Feliz cumpleaños, Valeria."</div>
+      <p class="juntos-msg">
+        Senku diría que la probabilidad de que alguien como tú existiera en el universo era ridícula.<br>
+        Gen diría que aun así, aquí estás — y que leer a alguien así es un privilegio poco común.<br><br>
+        Los dos estarían de acuerdo en algo: que el mundo del Reino Científico —<br>
+        y el de alguien más — es mejor porque tú despetrizaste hoy.
+      </p>
+    </div>
+  </div>
+</section>
+<div class="sep"></div>
+
+<!-- ══ CARTAS ══ -->
+<section id="cartas">
+  <p class="s-eye reveal">Transmisiones — El Reino Científico</p>
+  <h2 class="s-title reveal" style="transition-delay:.1s">Mensajes del Laboratorio</h2>
+  <div class="s-rule reveal" style="transition-delay:.2s"></div>
+  <div class="cartas-grid">
+    <div class="carta carta-senku reveal-l">
+      <div class="c-head">
+        <svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--verde)">
+          <path d="M9 3h6M9 3v11l-3 5.5a1 1 0 00.87 1.5h10.26a1 1 0 00.87-1.5L15 14V3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="c-nombre">Senku Ishigami</div>
+          <div class="c-rol">El Reino Científico — Científico Jefe</div>
+        </div>
+      </div>
+      <p class="c-body">
+        La probabilidad de que dos personas a distancia construyan algo real es, 10 mil millones porciento, absurda.<br><br>
+        Y sin embargo, aquí estamos.<br><br>
+        Eso no es suerte — estoy seguro al 10 mil millones porciento de que es algo que vale la pena.
+      </p>
+    </div>
+    <div class="carta carta-gen reveal-r" style="transition-delay:.15s">
+      <div class="c-head">
+        <svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#7A5C1E">
+          <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="c-nombre">Gen Asagiri</div>
+          <div class="c-rol">Mentalista — El Reino Científico</div>
+        </div>
+      </div>
+      <p class="c-body">
+        Sabes, yo leo personas. Es lo que hago.<br><br>
+        Y en ti leo algo poco común: eres el tipo de persona que hace que el mundo se sienta menos enorme.<br><br>
+        Feliz cumpleaños, Valeria. El Reino Científico — y alguien más — se alegra mucho de tenerte.
+      </p>
+    </div>
+  </div>
+</section>
+<div class="sep"></div>
+
+<!-- ══ INVENTARIO ══ -->
+<section id="inventario">
+  <p class="s-eye reveal">Registro — Recursos Recolectados</p>
+  <h2 class="s-title reveal" style="transition-delay:.1s">Inventario de Amistad</h2>
+  <div class="s-rule reveal" style="transition-delay:.2s"></div>
+  <div class="inv-grid" id="inv-container"></div>
+  <div class="inv-especial reveal" style="transition-delay:.15s">
+    <svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--dorado)">
+      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Valeria — recurso imposible de replicar.</span>
+  </div>
+</section>
+<div class="sep"></div>
+
+<!-- ══ FINAL ══ -->
+<section id="final">
+  <p class="s-eye reveal" style="position:relative;z-index:1">El Reino Científico — Transmisión final</p>
+  <h2 class="final-titulo reveal" style="transition-delay:.1s">Feliz cumpleaños,<br>Valeria.</h2>
+  <p class="final-mensaje reveal" style="transition-delay:.2s" id="mensaje-final"></p>
+  <p class="final-firma reveal" style="transition-delay:.3s" id="firma-final"></p>
+  <p class="kno3-deco reveal" style="transition-delay:.35s">— KNO₃ —</p>
+  <button class="btn-mecha reveal" style="transition-delay:.42s" onclick="lanzarConfeti()">¡Encender la mecha! 🔥</button>
+</section>
+
+<script>
+/* ══ CONFIG ══ */
+const CONFIG = {
+  fechaInicio: '2024-01-01',
+  momentos: [
+    { fecha:"Cuando todo empezó", titulo:"Primer contacto", descripcion:"El día que el universo decidió que dos personas al azar en internet tenían que cruzarse. Spoiler: fue buena idea." },
+    { fecha:"En algún capítulo épico", titulo:"Doctor Stone — Season watch", descripcion:"Viendo juntos cómo Senku reconstruye la civilización con nitrato de potasio y pura terquedad." },
+    { fecha:"Esas noches largas", titulo:"Partidas y más partidas", descripcion:"Horas que se convierten en madrugadas sin que nadie lo note. La mejor medida del tiempo que existe." },
+    { fecha:"Cada vez que hace falta", titulo:"Estar ahí sin estar cerca", descripcion:"La distancia es solo un dato geográfico. Lo demás — eso no lo mide ningún mapa." },
+  ],
+  inventario: [
+    "Horas de anime compartidas","Partidas que no tienen contador",
+    "Memes enviados sin contexto","Capítulos de Dr. Stone pendientes",
+    "Conversaciones de madrugada","Momentos que no necesitan nombre",
+  ],
+  mensajeFinal: `No sé exactamente cómo explicar lo que es conocer a alguien sin haberlo visto nunca. Pero contigo funciona. Cada conversación, cada partida, cada capítulo — suman algo que no tiene nombre formal todavía, pero que se siente muy real.\n\nFeliz cumpleaños, Valeria. Me alegra mucho que existas.`,
+  firma: "— Tu amigo / amiga",
+};
+
+/* ══════════════════════════════════════════════════
+   ANIMACIÓN DE DESPETRIFICACIÓN — v3 sin lag
+
+   Estrategia anti-lag:
+   1. Solo 5 grietas principales, sin hijos — suficiente para el efecto
+   2. Las grietas se pre-renderizan en un OffscreenCanvas (cracksBitmap)
+      que se actualiza SOLO cuando hay progreso nuevo, no cada frame
+   3. El loop principal hace máximo 2 drawImage por frame (piedra + grietas)
+   4. shadowBlur = 0 siempre (es la operación más cara en canvas 2D)
+      El glow se simula con 2 strokes de ancho diferente
+   5. Partículas reducidas a 40 y sin arc() — usan fillRect rotado
+══════════════════════════════════════════════════ */
+(function depetri() {
+  const intro  = document.getElementById('intro-screen');
+  const canvas = document.getElementById('depetri-canvas');
+  const flash  = document.getElementById('green-flash');
+  const ctx    = canvas.getContext('2d');
+  let W, H, rafId;
+
+  let stoneBitmap = null;   // ImageBitmap de la textura de piedra
+  let cracksOC    = null;   // OffscreenCanvas donde se acumulan las grietas
+  let cracksOCctx = null;
+  let cracksDirty = false;  // true solo cuando hay nuevos segmentos que pintar
+
+  const state = {
+    fase: 'idle',
+    cracks: [],
+    particles: [],
+    dissolve: 0,
+    shakeT: 0,
+  };
+
+  /* ── Resize ── */
+  function resize() {
+    W = canvas.width  = intro.offsetWidth;
+    H = canvas.height = intro.offsetHeight;
+    // Recrear el offscreen de grietas con el nuevo tamaño
+    cracksOC    = new OffscreenCanvas(W, H);
+    cracksOCctx = cracksOC.getContext('2d');
+    cracksDirty = false;
+  }
+
+  /* ── Textura de piedra (async, no bloquea UI) ── */
+  async function buildStoneTexture() {
+    const oc  = new OffscreenCanvas(W, H);
+    const oc2 = oc.getContext('2d');
+    const id  = oc2.createImageData(W, H);
+    const d   = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const r    = Math.random();
+      const vein = r < 0.003 ? 35 : 0;
+      const v    = (18 + r * 22 + vein) | 0;
+      d[i] = v; d[i+1] = v + 2; d[i+2] = v + 5; d[i+3] = 255;
+    }
+    oc2.putImageData(id, 0, 0);
+    stoneBitmap = await createImageBitmap(oc);
+  }
+
+  /* ── Genera UNA grieta (sin recursión, sin hijos) ── */
+  function newCrack(ox, oy, angle, maxLen) {
+    const pts = [{ x: ox, y: oy }];
+    let x = ox, y = oy, a = angle;
+    const steps = Math.floor(maxLen / 12);
+    for (let i = 0; i < steps; i++) {
+      a += (Math.random() - 0.5) * 0.5;
+      const step = 10 + Math.random() * 10;
+      x += Math.cos(a) * step;
+      y += Math.sin(a) * step;
+      pts.push({ x, y });
+    }
+    return { pts, drawn: 0, speed: 3 + Math.random() * 2, done: false };
+  }
+
+  /* ── Dibuja SOLO los segmentos nuevos de una grieta en el offscreen ── */
+  function paintCrackSegment(crack, prevDrawn) {
+    const end  = crack.drawn | 0;
+    const from = Math.max(prevDrawn | 0, 1);
+    if (end < from) return;
+
+    const oc = cracksOCctx;
+
+    // Glow exterior: stroke grueso semitransparente verde
+    oc.beginPath();
+    oc.moveTo(crack.pts[from - 1].x, crack.pts[from - 1].y);
+    for (let i = from; i <= end; i++) oc.lineTo(crack.pts[i].x, crack.pts[i].y);
+    oc.strokeStyle = 'rgba(139,195,74,0.45)';
+    oc.lineWidth   = 5;
+    oc.lineCap = oc.lineJoin = 'round';
+    oc.stroke();
+
+    // Línea verde media
+    oc.beginPath();
+    oc.moveTo(crack.pts[from - 1].x, crack.pts[from - 1].y);
+    for (let i = from; i <= end; i++) oc.lineTo(crack.pts[i].x, crack.pts[i].y);
+    oc.strokeStyle = 'rgba(139,195,74,0.85)';
+    oc.lineWidth   = 1.8;
+    oc.stroke();
+
+    // Línea oscura central (fisura real)
+    oc.beginPath();
+    oc.moveTo(crack.pts[from - 1].x, crack.pts[from - 1].y);
+    for (let i = from; i <= end; i++) oc.lineTo(crack.pts[i].x, crack.pts[i].y);
+    oc.strokeStyle = 'rgba(0,0,0,0.6)';
+    oc.lineWidth   = 0.8;
+    oc.stroke();
+  }
+
+  /* ── Partículas ligeras: fillRect en vez de arc ── */
+  function spawnParticles() {
+    for (let i = 0; i < 40; i++) {
+      state.particles.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: -Math.random() * 3.5 - 0.8,
+        size: Math.random() * 4 + 1,
+        color: Math.random() < 0.5 ? '#8BC34A' : '#aaaaaa',
+        life: 1,
+      });
+    }
+  }
+
+  function updateParticles() {
+    const alive = [];
+    for (const p of state.particles) {
+      p.vy += 0.06; p.x += p.vx; p.y += p.vy; p.life -= 0.022;
+      if (p.life <= 0.01) continue;
+      alive.push(p);
+      ctx.globalAlpha = p.life * 0.8;
+      ctx.fillStyle   = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
+    state.particles = alive;
+  }
+
+  /* ── Dibuja piedra ── */
+  function drawStone(alpha) {
+    if (!stoneBitmap) return;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(stoneBitmap, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+
+  /* ── Loop principal: máximo 2-3 drawImage por frame ── */
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (state.fase === 'idle') {
+      drawStone(1);
+
+    } else if (state.fase === 'cracks') {
+      drawStone(1);
+
+      // Avanzar grietas y pintar solo segmentos nuevos en el offscreen
+      let allDone = true;
+      for (const c of state.cracks) {
+        if (c.done) continue;
+        const prev = c.drawn;
+        c.drawn = Math.min(c.drawn + c.speed, c.pts.length - 1);
+        if (c.drawn > prev) {
+          paintCrackSegment(c, prev);
+          cracksDirty = true;
+        }
+        if (c.drawn < c.pts.length - 1) allDone = false;
+        else c.done = true;
+      }
+
+      // Una sola drawImage del bitmap de grietas
+      ctx.drawImage(cracksOC, 0, 0);
+
+      if (allDone) { state.fase = 'shake'; state.shakeT = 0; }
+
+    } else if (state.fase === 'shake') {
+      state.shakeT++;
+      const prog = state.shakeT / 35;
+      const amp  = 4 * (1 - prog);
+      const sx   = Math.sin(state.shakeT * 1.9) * amp;
+      const sy   = Math.cos(state.shakeT * 2.3) * amp * 0.6;
+      ctx.save(); ctx.translate(sx, sy);
+      drawStone(1);
+      ctx.drawImage(cracksOC, 0, 0);
+      ctx.restore();
+      if (state.shakeT >= 35) {
+        state.fase = 'flash';
+        flash.classList.add('on');
+        setTimeout(() => {
+          flash.classList.remove('on');
+          state.fase = 'dissolve';
+          spawnParticles();
+        }, 100);
+      }
+
+    } else if (state.fase === 'dissolve') {
+      state.dissolve += 0.02;
+      const p = Math.min(state.dissolve, 1);
+      drawStone(1 - p);
+      ctx.globalAlpha = (1 - p) * 0.7;
+      ctx.drawImage(cracksOC, 0, 0);
+      ctx.globalAlpha = 1;
+      updateParticles();
+      if (p >= 1 && state.particles.length === 0) {
+        cancelAnimationFrame(rafId);
+        setTimeout(() => {
+          intro.classList.add('fade-out');
+          setTimeout(() => intro.style.display = 'none', 1300);
+        }, 400);
+        return;
+      }
+    }
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  /* ── Init ── */
+  window.addEventListener('load', async () => {
+    resize();
+    await buildStoneTexture();
+    loop();
+
+    // Grietas al terminar el typewriter: solo 5 principales desde el centro
+    setTimeout(() => {
+      const cx = W / 2, cy = H / 2;
+      const diag = Math.sqrt(W * W + H * H) * 0.55;
+      // 5 grietas radiales, ángulos bien separados para que no se amontonen
+      const angles = [0, 0.63, 1.26, 1.88, 2.51]; // ~72° entre cada una
+      const offset = Math.random() * Math.PI * 2;
+      for (const a of angles) {
+        state.cracks.push(newCrack(cx, cy, a + offset, diag * (0.75 + Math.random() * 0.25)));
+      }
+      state.fase = 'cracks';
+    }, 4000);
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(async () => {
+      resize();
+      await buildStoneTexture();
+      // Limpiar grietas previas al redimensionar
+      state.cracks    = [];
+      state.particles = [];
+      if (state.fase !== 'idle' && state.fase !== 'done') state.fase = 'idle';
+    }, 250);
+  });
+})();
+
+/* ══ TYPEWRITER ══ */
+const lineas = [
+  { id:'tl1', txt:'Iniciando protocolo de celebración...' },
+  { id:'tl2', txt:'Calculando probabilidad de que existieras... 10,000,000,000%' },
+  { id:'tl3', txt:'Resultado: valió cada segundo.' },
+];
+let tl = 0, tc = 0;
+function typeNext() {
+  if (tl >= lineas.length) return;
+  const { id, txt } = lineas[tl];
+  const el = document.getElementById(id);
+  if (tc < txt.length) { el.textContent = txt.slice(0, ++tc); setTimeout(typeNext, 36); }
+  else { tc = 0; tl++; setTimeout(typeNext, 460); }
+}
+window.addEventListener('load', () => setTimeout(typeNext, 400));
+
+/* ══ CONTADOR ══ */
+(function() {
+  const inicio = new Date(CONFIG.fechaInicio);
+  function tick() {
+    const diff = Date.now() - inicio;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('cnt-d').textContent = String(d).padStart(3,'0');
+    document.getElementById('cnt-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('cnt-m').textContent = String(m).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 60000);
+})();
+
+/* ══ PARTÍCULAS HERO ══ */
+(function() {
+  const c = document.getElementById('particulas');
+  const cols = ['#8BC34A','#C9A84C','#a8d878','#e8d070'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particula';
+    const sz = Math.random() * 5 + 2;
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${Math.random()*15}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${Math.random()*10+8}s;animation-delay:${Math.random()*12}s;`;
+    c.appendChild(p);
+  }
+})();
+
+/* ══ BITÁCORA ══ */
+(function() {
+  const c = document.getElementById('timeline-container');
+  CONFIG.momentos.forEach((m, i) => {
+    const d = document.createElement('div');
+    d.className = 'tl-item reveal';
+    d.style.transitionDelay = `${i * 0.12}s`;
+    d.innerHTML = `<div class="tl-fecha">${m.fecha}</div><div class="tl-titulo">${m.titulo}</div><div class="tl-desc">${m.descripcion}</div>`;
+    c.appendChild(d);
+  });
+})();
+
+/* ══ INVENTARIO ══ */
+(function() {
+  const c = document.getElementById('inv-container');
+  const ics = [
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3h6M9 3v11l-3 5.5a1 1 0 00.87 1.5h10.26a1 1 0 00.87-1.5L15 14V3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="15" y1="10" x2="19" y2="10" stroke-linecap="round"/><line x1="15" y1="14" x2="19" y2="14" stroke-linecap="round"/></svg>`,
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 004 22h16V2H6.5A2.5 2.5 0 004 4.5v15z" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>`,
+    `<svg class="inv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  ];
+  CONFIG.inventario.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.className = 'inv-item reveal-z';
+    d.style.transitionDelay = `${i * 0.08}s`;
+    d.innerHTML = `${ics[i % ics.length]}<span>${item}</span>`;
+    c.appendChild(d);
+  });
+})();
+
+/* ══ MENSAJE + FIRMA ══ */
+document.getElementById('mensaje-final').textContent = CONFIG.mensajeFinal;
+document.getElementById('firma-final').textContent   = CONFIG.firma;
+
+/* ══ INTERSECTION OBSERVER ══ */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -35px 0px' });
+document.querySelectorAll('#hero .reveal, #hero .reveal-l, #hero .reveal-r, #hero .reveal-z')
+  .forEach(el => setTimeout(() => el.classList.add('visible'), 200));
+document.querySelectorAll('.reveal, .reveal-l, .reveal-r, .reveal-z')
+  .forEach(el => { if (!el.closest('#hero')) obs.observe(el); });
+
+/* ══ CONFETI ══ */
+const cc   = document.getElementById('confeti-canvas');
+const cctx = cc.getContext('2d');
+let pz = [], af = null;
+function resize2() { cc.width = innerWidth; cc.height = innerHeight; }
+resize2(); window.addEventListener('resize', resize2);
+function mkP(x, y) {
+  const cols = ['#8BC34A','#C9A84C','#a8d878','#e8d070','#fff','#6aa832','#d4b050'];
+  return { x, y, vx:(Math.random()-.5)*9, vy:Math.random()*-11-4, rot:Math.random()*Math.PI*2, vrot:(Math.random()-.5)*.3, w:Math.random()*11+5, h:Math.random()*5+3, color:cols[Math.floor(Math.random()*cols.length)], alpha:1, g:.26 };
+}
+function animC() {
+  cctx.clearRect(0,0,cc.width,cc.height);
+  pz = pz.filter(p=>p.alpha>0.01);
+  pz.forEach(p => {
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vrot;
+    if (p.y>cc.height*.55) p.alpha-=.016;
+    cctx.save(); cctx.globalAlpha=p.alpha; cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+    cctx.fillStyle=p.color; cctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    cctx.restore();
+  });
+  if (pz.length>0) af=requestAnimationFrame(animC);
+  else cctx.clearRect(0,0,cc.width,cc.height);
+}
+function salva(x,y,n){ for(let i=0;i<n;i++) pz.push(mkP(x,y)); }
+function lanzarConfeti(){
+  if(af) cancelAnimationFrame(af);
+  pz=[];
+  const cx=cc.width/2, cy=cc.height*.62;
+  salva(cx,cy,130);
+  setTimeout(()=>salva(cx*.35,cy,70),260);
+  setTimeout(()=>salva(cx*1.65,cy,70),480);
+  animC();
+}
+</script>
+</body>
+</html>
